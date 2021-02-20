@@ -19,13 +19,11 @@ const App = () => {
 
   useEffect(fetchData, [])
 
-  // const filteredPersons = persons.filter((person) =>
-  //   person.name.toLowerCase().includes(newSearch.toLowerCase())
-  // )
+  const filteredPersons = persons.filter((person) =>
+    person.name.toLowerCase().includes(newSearch.toLowerCase())
+  )
 
-  // const personsToShow = newSearch === undefined ? persons : filteredPersons
-
-  const personsToShow = persons
+  const personsToShow = newSearch === undefined ? persons : filteredPersons
 
   return (
     <div>

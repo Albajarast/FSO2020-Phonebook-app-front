@@ -13,20 +13,10 @@ function PersonForm({ persons, setPersons, setSuccessMessage }) {
       number: newNumber
     }
 
-    let foundPerson = false
-    let foundPersonIndex = persons.findIndex(
-      (person) => person.name === newName
-    )
-    let foundPersonId
-    if (foundPersonIndex !== -1) {
-      const fountPersonIndex = persons.findIndex(
-        (person) => person.name === newName
-      )
-      foundPersonId = foundPersonIndex + 1
-      foundPerson = true
-    }
+    const [foundPerson] = persons.filter((person) => person.name === newName)
 
     if (!foundPerson) {
+      console.log('Not person found')
       personService.create(newPerson).then((response) => {
         setPersons(persons.concat(response))
         setSuccessMessage(`${response.name} successfully added to the list`)
@@ -34,18 +24,23 @@ function PersonForm({ persons, setPersons, setSuccessMessage }) {
         setNewNumber('')
       })
     } else {
+      console.log('Person found', foundPerson)
       setNewName('')
       setNewNumber('')
       const update = window.confirm(
-        `${persons[foundPersonIndex].name} already exists! Do you want to replace the old number with a new one?`
+        `${foundPerson.name} already exists! Do you want to replace the old number with a new one?`
       )
+
       if (update) {
+        console.log(
+          `Update requested for id ${foundPerson.id} and name: ${foundPerson.name}`
+        )
         personService
-          .updateById(foundPersonId, newPerson)
+          .updateById(foundPerson.id, newPerson)
           .then((returnedPerson) => {
             setPersons(
               persons.map((person) =>
-                person.id !== foundPersonId ? person : returnedPerson
+                person.id !== foundPerson.id ? person : returnedPerson
               )
             )
             setSuccessMessage(`${returnedPerson.name} updated`)

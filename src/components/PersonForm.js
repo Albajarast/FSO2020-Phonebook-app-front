@@ -2,7 +2,12 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import personService from '../services/persons'
 
-function PersonForm({ persons, setPersons, setSuccessMessage }) {
+function PersonForm({
+  persons,
+  setPersons,
+  setSuccessMessage,
+  setErrorMessage
+}) {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
 
@@ -17,14 +22,18 @@ function PersonForm({ persons, setPersons, setSuccessMessage }) {
 
     if (!foundPerson) {
       console.log('Not person found')
-      personService.create(newPerson).then((response) => {
-        setPersons(persons.concat(response))
-        setSuccessMessage(`${response.name} successfully added to the list`)
-        setNewName('')
-        setNewNumber('')
-      })
+      personService
+        .create(newPerson)
+        .then((response) => {
+          setPersons(persons.concat(response))
+          setSuccessMessage(`${response.name} successfully added to the list`)
+          setNewName('')
+          setNewNumber('')
+        })
+        .catch((err) => {
+          setErrorMessage(err.response.data.error)
+        })
     } else {
-      console.log('Person found', foundPerson)
       setNewName('')
       setNewNumber('')
       const update = window.confirm(
@@ -32,9 +41,6 @@ function PersonForm({ persons, setPersons, setSuccessMessage }) {
       )
 
       if (update) {
-        console.log(
-          `Update requested for id ${foundPerson.id} and name: ${foundPerson.name}`
-        )
         personService
           .updateById(foundPerson.id, newPerson)
           .then((returnedPerson) => {
@@ -47,6 +53,9 @@ function PersonForm({ persons, setPersons, setSuccessMessage }) {
             setTimeout(() => {
               setSuccessMessage(null)
             }, 3000)
+          })
+          .catch((err) => {
+            setErrorMessage(err.response.data.error)
           })
       } else {
         console.log('Cancelled!')
